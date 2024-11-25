@@ -14,6 +14,8 @@ services:
     environment:
       GITHUB_REPO: ${GITHUB_REPO}
       NODE_ENV: production # Définit l'environnement en mode production
+    volumes:
+    - .env:/app/.env  # Monter le fichier .env dans le conteneur
     restart: always # Redémarre automatiquement le conteneur en cas de plantage
     networks:
       - ci_network
@@ -35,6 +37,7 @@ services:
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock  # Monter uniquement le socket Docker si nécessaire
+      - .env:/var/jenkins_home/.env  # Monter le fichier .env pour Jenkins
     networks:
       - ci_network
 

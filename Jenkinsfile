@@ -7,10 +7,14 @@ pipeline {
         stage('Load Environment Variables') {
             steps {
                 script {
-                    def envVars = readFile("${ENV_FILE}").split('\n').findAll { it.trim() && !it.startsWith('#') }
-                    envVars.each { envVar ->
-                        def (key, value) = envVar.split('=').collect { it.trim() }
-                        env[key] = value
+                    if (fileExists('.env')) {
+                        def envVars = readFile('.env').split('\n').findAll { it.trim() && !it.startsWith('#') }
+                        envVars.each { envVar ->
+                            def (key, value) = envVar.split('=').collect { it.trim() }
+                            env[key] = value
+                        }
+                    } else {
+                        error ".env file not found in workspace."
                     }
                 }
             }
