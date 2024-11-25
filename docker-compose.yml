@@ -22,7 +22,7 @@ services:
 
 
   jenkins:
-    image: jenkins/jenkins:lts # Image officielle de Jenkins (version LTS)
+    image: custom-jenkins
     container_name: jenkins
     ports:
       - "8080:8080"
