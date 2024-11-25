@@ -13,8 +13,17 @@ pipeline {
         }
         stage('Checkout Code') {
             steps {
-                // Cloner le code source depuis le dépôt GitHub
-                sh 'git clone $GITHUB_REPO .'
+                script {
+                    if (fileExists('.git')) {
+                        // Si le dépôt existe déjà, faire un pull
+                        sh 'git reset --hard HEAD'
+                        sh 'git clean -fd'
+                        sh 'git pull'
+                    } else {
+                        // Sinon, cloner le dépôt
+                        sh 'git clone $GITHUB_REPO .'
+                    }
+                }
             }
         }
         stage('Build Docker Image') {
