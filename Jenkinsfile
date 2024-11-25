@@ -6,17 +6,19 @@ pipeline {
     stages {
         stage('Load Environment Variables') {
             steps {
-                script {
-                    if (fileExists('.env')) {
-                        def envVars = readFile('.env').split('\n').findAll { it.trim() && !it.startsWith('#') }
-                        envVars.each { envVar ->
-                            def (key, value) = envVar.split('=').collect { it.trim() }
-                            env[key] = value
-                        }
+               script {
+                    if (fileExists('/var/jenkins_home/.env')) {
+                        sh 'export $(cat /var/jenkins_home/.env | xargs)'
                     } else {
-                        error ".env file not found in workspace."
+                        error '.env file not found in workspace.'
                     }
                 }
+            }
+        }
+        stage('Debug Workspace') {
+            steps {
+                sh 'ls -al'
+                sh 'cat .env || echo "No .env file found"'
             }
         }
         stage('Debug Variables') {
