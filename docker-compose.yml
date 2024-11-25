@@ -22,15 +22,14 @@ services:
 
 
   jenkins:
-    build:
-      context: ./jenkins
+    image: jenkins/jenkins:lts # Image officielle de Jenkins (version LTS)
     container_name: jenkins
-    user: root
     ports:
       - "8080:8080"
       - "50000:50000"
     environment:
-      JENKINS_OPTS: --prefix=/jenkins
+      - JENKINS_OPTS=--httpPort=8080 # Options pour Jenkins
+      # JENKINS_OPTS: --prefix=/jenkins
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock  # Monter uniquement le socket Docker si nécessaire
