@@ -1,0 +1,55 @@
+# Node.js artifacts
+node_modules/
+dist/
+.npm/
+.yarn/
+.pnp/
+.pnp.js
+
+# Nuxt.js build files
+.nuxt/
+.output/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Test coverage
+coverage/
+
+# Environment variables
+.env
+.env.* 
+
+# IDE-specific files
+.vscode/
+.idea/
+*.code-workspace
+*.sublime-project
+*.sublime-workspace
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# CI/CD
+*.jenkins
+
+# Applications and binaries
+*.app
+*.exe
+*.war
+
+# Media files
+*.mp4
+*.tiff
+*.avi
+*.flv
+*.mov
+*.wmv
