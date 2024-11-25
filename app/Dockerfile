@@ -30,8 +30,6 @@ COPY --from=builder /app/package*.json ./
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 
-# Installer uniquement les dépendances de production
-RUN npm install --omit=dev && npm cache clean --force
 
 # Exposer le port pour l'application
 EXPOSE 3000
