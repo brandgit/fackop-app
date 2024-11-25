@@ -37,7 +37,7 @@ services:
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock  # Monter uniquement le socket Docker si nécessaire
-      - ./app/.env:/var/jenkins_home/.env  # Monter le fichier .env pour Jenkins
+      - .env:/var/jenkins_home/.env  # Monter le fichier .env pour Jenkins
     networks:
       - ci_network
 
