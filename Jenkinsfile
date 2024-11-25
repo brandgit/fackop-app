@@ -8,7 +8,13 @@ pipeline {
         stage('Load Environment Variables') {
             steps {
                 // Charger les variables depuis le fichier .env
-                sh 'export $(cat ${ENV_FILE} | xargs)'
+                script {
+                    def envVars = readFile("${ENV_FILE}").split('\n').findAll { it.trim() && !it.startsWith('#') }
+                    envVars.each { envVar ->
+                        def (key, value) = envVar.split('=').collect { it.trim() }
+                        env[key] = value
+                    }
+                }
             }
         }
         stage('Checkout Code') {
@@ -34,20 +40,20 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 // Construire l'image Docker en utilisant les variables d'environnement
-                sh 'docker build -t $DOCKER_IMAGE_NAME --build-arg GITHUB_REPO=$GITHUB_REPO .'
+                sh 'docker build -t $env.DOCKER_IMAGE_NAME --build-arg GITHUB_REPO=$env.GITHUB_REPO .'
             }
         }
         stage('Run Tests') {
             steps {
-                // Exécuter les tests et générer la couverture
+                // Exécuter les tests et générer la couvertureS
                 sh '''
                     docker run --rm \
-                    -e NODE_ENV=developpement \
-                    ${DOCKER_IMAGE_NAME} npm run test
+                    -e NODE_ENV=$env.NODE_ENV \
+                    $env.DOCKER_IMAGE_NAME npm run test
                 '''
                 // Copier les rapports de couverture
                 sh '''
-                    docker cp $(docker create ${DOCKER_IMAGE_NAME}):/app/coverage ./coverage
+                    docker cp $(docker create ${env.DOCKER_IMAGE_NAME}):/app/coverage ./coverage
                 '''
             }
         }
@@ -56,10 +62,11 @@ pipeline {
                 // Démarrer le conteneur avec les variables d'environnement
                  // Déployer sur l'hôte spécifié
                 sh '''
-                    docker -H tcp://${DEPLOY_HOST}:2375 stop ${DOCKER_CONTAINER_NAME} || true
-                    docker -H tcp://${DEPLOY_HOST}:2375 rm ${DOCKER_CONTAINER_NAME} || true
-                    docker -H tcp://${DEPLOY_HOST}:2375 run -d --name ${DOCKER_CONTAINER_NAME} -p ${DEPLOY_PORT}:3000 -e NODE_ENV=${NODE_ENV} ${DOCKER_IMAGE_NAME}
-                '''
+                        docker -H tcp://$env.DEPLOY_HOST:2375 stop $env.DOCKER_CONTAINER_NAME || true
+                        docker -H tcp://$env.DEPLOY_HOST:2375 rm $env.DOCKER_CONTAINER_NAME || true
+                        docker -H tcp://$env.DEPLOY_HOST:2375 run -d --name $env.DOCKER_CONTAINER_NAME -p $env.DEPLOY_PORT:3000 -e NODE_ENV=$env.NODE_ENV $env.DOCKER_IMAGE_NAME
+                    '''
+
             }
         }
         stage('Verify Deployment') {
