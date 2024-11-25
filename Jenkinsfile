@@ -15,12 +15,17 @@ pipeline {
             steps {
                 script {
                     if (fileExists('.git')) {
-                        // Si le dépôt existe déjà, faire un pull
+                        // Vérifiez la branche active
+                        sh 'git checkout master || git checkout main'
+
+                        // Réinitialiser l'état du dépôt
                         sh 'git reset --hard HEAD'
                         sh 'git clean -fd'
-                        sh 'git pull'
+
+                        // Mettre à jour le code
+                        sh 'git pull origin $(git rev-parse --abbrev-ref HEAD)'
                     } else {
-                        // Sinon, cloner le dépôt
+                        // Cloner le dépôt si .git n'existe pas
                         sh 'git clone $GITHUB_REPO .'
                     }
                 }
