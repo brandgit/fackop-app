@@ -22,6 +22,8 @@ services:
 
 
   jenkins:
+    build:
+        context: ./jenkins
     image: custom-jenkins
     container_name: jenkins
     ports:
