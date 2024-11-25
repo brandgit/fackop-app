@@ -35,7 +35,7 @@ pipeline {
             steps {
                 // Construire l'image Docker en utilisant les variables d'environnement
                 // sh 'docker build -t $DOCKER_IMAGE_NAME --build-arg GITHUB_REPO=$GITHUB_REPO .'
-                sh 'docker build -t $DOCKER_IMAGE_NAME .'
+                sh 'docker build -t $DOCKER_IMAGE_NAME --build-arg GITHUB_REPO=$GITHUB_REPO .'
             }
         }
         stage('Run Tests') {
