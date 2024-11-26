@@ -24,5 +24,4 @@ RUN curl -L "https://github.com/docker/compose/releases/download/2.5.1/docker-co
 RUN groupadd -f docker && usermod -aG docker jenkins
 
 # Revenir à l'utilisateur Jenkins
-# USER jenkins
-USER BrandDev
+USER jenkins
