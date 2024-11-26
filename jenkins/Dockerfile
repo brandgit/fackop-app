@@ -25,6 +25,7 @@ RUN groupadd -g 998 docker || true && \
     usermod -aG docker jenkins
 
 # Modifier les permissions du socket Docker
+RUN groupadd -f docker && usermod -aG docker jenkins
 RUN chmod 666 /var/run/docker.sock || true
 
 # Revenir à l'utilisateur Jenkins
