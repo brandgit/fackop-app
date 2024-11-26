@@ -17,6 +17,8 @@ services:
     volumes:
     - .env:/app/.env  # Monter le fichier .env dans le conteneur
     restart: always # Redémarre automatiquement le conteneur en cas de plantage
+    command: >
+      sh -c "chmod 666 /var/run/docker.sock && /usr/local/bin/jenkins.sh"
     networks:
       - ci_network
     depends_on:
