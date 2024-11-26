@@ -20,18 +20,23 @@ pipeline {
                 script {
                     // Vérifier si le fichier .env existe
                     if (fileExists(env.ENV_FILE)) {
-                            // Extraire et charger une seule variable d'environnement
-                        def dockerImageName = sh(script: "grep ^DOCKER_IMAGE_NAME= ${env.ENV_FILE} | cut -d '=' -f2", returnStdout: true).trim()
-                        echo "DOCKER_IMAGE_NAME = ${dockerImageName}"
-                        env.DOCKER_IMAGE_NAME = dockerImageName // Charger la variable dans l'environnement Jenkins
-                        sh '''
-                            #echo "Fichier .env trouvé. Chargement des variables..."
-        
-                            export $(cat ${ENV_FILE} | xargs)
-                            export $(cat ${ENV_FILE.DOCKER_IMAGE_NAME} | xargs)
-                        '''
+                        // Charger toutes les variables nécessaires depuis le fichier .env
+                        env.DOCKER_IMAGE_NAME = sh(script: "grep ^DOCKER_IMAGE_NAME= ${env.ENV_FILE} | cut -d '=' -f2", returnStdout: true).trim()
+                        env.GITHUB_REPO = sh(script: "grep ^GITHUB_REPO= ${env.ENV_FILE} | cut -d '=' -f2", returnStdout: true).trim()
+                        env.DOCKER_CONTAINER_NAME = sh(script: "grep ^DOCKER_CONTAINER_NAME= ${env.ENV_FILE} | cut -d '=' -f2", returnStdout: true).trim()
+                        env.DEPLOY_HOST = sh(script: "grep ^DEPLOY_HOST= ${env.ENV_FILE} | cut -d '=' -f2", returnStdout: true).trim()
+                        env.DEPLOY_PORT = sh(script: "grep ^DEPLOY_PORT= ${env.ENV_FILE} | cut -d '=' -f2", returnStdout: true).trim()
+                        env.NODE_ENV = sh(script: "grep ^NODE_ENV= ${env.ENV_FILE} | cut -d '=' -f2", returnStdout: true).trim()
+
+                        echo "Variables chargées :"
+                        echo "DOCKER_IMAGE_NAME = ${env.DOCKER_IMAGE_NAME}"
+                        echo "GITHUB_REPO = ${env.GITHUB_REPO}"
+                        echo "DOCKER_CONTAINER_NAME = ${env.DOCKER_CONTAINER_NAME}"
+                        echo "DEPLOY_HOST = ${env.DEPLOY_HOST}"
+                        echo "DEPLOY_PORT = ${env.DEPLOY_PORT}"
+                        echo "NODE_ENV = ${env.NODE_ENV}"
                     } else {
-                        error("Le fichier .env est introuvable à l'emplacement : ${ENV_FILE}")
+                        error("Le fichier .env est introuvable à l'emplacement : ${env.ENV_FILE}")
                     }
                 }
             }
@@ -45,21 +50,21 @@ pipeline {
                         sh 'git clean -fd'
                         sh 'git pull origin $(git rev-parse --abbrev-ref HEAD)'
                     } else {
-                        sh 'git clone $GITHUB_REPO .'
+                        sh "git clone ${env.GITHUB_REPO} ."
                     }
                 }
             }
         }
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t ${ENV_FILE.DOCKER_IMAGE_NAME} --build-arg GITHUB_REPO=${ENV_FILE.GITHUB_REPO} .'
+                sh "docker build -t ${env.DOCKER_IMAGE_NAME} --build-arg GITHUB_REPO=${env.GITHUB_REPO} ."
             }
         }
         stage('Run Tests') {
             steps {
                 sh '''
                     docker run --rm \
-                    -e NODE_ENV=developpement \
+                    -e NODE_ENV=${NODE_ENV} \
                     ${DOCKER_IMAGE_NAME} npm run test
                 '''
                 sh '''
@@ -79,7 +84,7 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 script {
-                    echo "Application déployée sur http://${DEPLOY_HOST}:${DEPLOY_PORT}"
+                    echo "Application déployée sur http://${env.DEPLOY_HOST}:${env.DEPLOY_PORT}"
                 }
             }
         }
@@ -89,10 +94,10 @@ pipeline {
             sh 'docker system prune -f || true'
         }
         success {
-            echo "Pipeline exécuté avec succès pour le dépôt $GITHUB_REPO."
+            echo "Pipeline exécuté avec succès pour le dépôt ${env.GITHUB_REPO}."
         }
         failure {
-            echo "Échec du pipeline. Vérifiez les logs pour le dépôt $GITHUB_REPO."
+            echo "Échec du pipeline. Vérifiez les logs pour le dépôt ${env.GITHUB_REPO}."
         }
     }
 }
