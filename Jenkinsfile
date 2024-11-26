@@ -1,38 +1,44 @@
 pipeline {
     agent any
     environment {
-        // Charger les variables d'environnement depuis le fichier .env
-        ENV_FILE = '.env'
+        ENV_FILE = '/var/jenkins_home/workspace/.env' // Emplacement du .env dans Jenkins
     }
-    
+
     stages {
-        stage('using env vars'){
-            steps{
-                echo "DEPLOY_PORT = ${env.DEPLOY_PORT}"
-                sh 'echo DEPLOY_PORT = $DEPLOY_PORT'
+        stage('Debug Variables') {
+            steps {
+                sh '''
+                    echo "Liste des fichiers dans le workspace :"
+                    ls -la /var/jenkins_home/workspace/
+                    echo "Contenu du fichier .env :"
+                    cat /var/jenkins_home/workspace/.env || echo "Fichier introuvable"
+                '''
             }
         }
         stage('Load Environment Variables') {
             steps {
-                // Charger les variables depuis le fichier .env
-                sh 'export $(cat ${ENV_FILE} | xargs)'
+                script {
+                    // Vérifier si le fichier .env existe
+                    if (fileExists(env.ENV_FILE)) {
+                        sh '''
+                            echo "Fichier .env trouvé. Chargement des variables..."
+                            export $(cat ${ENV_FILE} | xargs)
+                        '''
+                    } else {
+                        error("Le fichier .env est introuvable à l'emplacement : ${ENV_FILE}")
+                    }
+                }
             }
         }
         stage('Checkout Code') {
             steps {
                 script {
                     if (fileExists('.git')) {
-                        // Vérifiez la branche active
                         sh 'git checkout master || git checkout main'
-
-                        // Réinitialiser l'état du dépôt
                         sh 'git reset --hard HEAD'
                         sh 'git clean -fd'
-
-                        // Mettre à jour le code
                         sh 'git pull origin $(git rev-parse --abbrev-ref HEAD)'
                     } else {
-                        // Cloner le dépôt si .git n'existe pas
                         sh 'git clone $GITHUB_REPO .'
                     }
                 }
@@ -40,19 +46,16 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                // Construire l'image Docker en utilisant les variables d'environnement
                 sh 'docker build -t $DOCKER_IMAGE_NAME --build-arg GITHUB_REPO=$GITHUB_REPO .'
             }
         }
         stage('Run Tests') {
             steps {
-                // Exécuter les tests et générer la couverture
                 sh '''
                     docker run --rm \
                     -e NODE_ENV=developpement \
                     ${DOCKER_IMAGE_NAME} npm run test
                 '''
-                // Copier les rapports de couverture
                 sh '''
                     docker cp $(docker create ${DOCKER_IMAGE_NAME}):/app/coverage ./coverage
                 '''
@@ -60,8 +63,6 @@ pipeline {
         }
         stage('Deploy Application') {
             steps {
-                // Démarrer le conteneur avec les variables d'environnement
-                 // Déployer sur l'hôte spécifié
                 sh '''
                     docker -H tcp://${DEPLOY_HOST}:2375 stop ${DOCKER_CONTAINER_NAME} || true
                     docker -H tcp://${DEPLOY_HOST}:2375 rm ${DOCKER_CONTAINER_NAME} || true
@@ -76,14 +77,10 @@ pipeline {
                 }
             }
         }
-
     }
     post {
         always {
-            // Nettoyer les conteneurs arrêtés et les images inutilisées
-            sh '''
-                docker system prune -f || true
-            '''
+            sh 'docker system prune -f || true'
         }
         success {
             echo "Pipeline exécuté avec succès pour le dépôt $GITHUB_REPO."
