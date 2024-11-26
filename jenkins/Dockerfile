@@ -20,12 +20,11 @@ RUN curl -L "https://github.com/docker/compose/releases/download/2.5.1/docker-co
     -o /usr/local/bin/docker-compose && \
     chmod +x /usr/local/bin/docker-compose
 
-#     # Copier le fichier .env dans le conteneur
-# COPY ../.env /var/jenkins_home/
-# COPY ../.env /var/jenkins_home/workspace/
-
-# Ajouter l'utilisateur Jenkins au groupe Docker
-RUN usermod -aG docker jenkins
+# Ajouter l'utilisateur Jenkins au groupe Docker et appliquer les permissions
+RUN groupadd -g 998 docker || true && \
+    usermod -aG docker jenkins && \
+    chown root:docker /var/run/docker.sock || true && \
+    chmod 666 /var/run/docker.sock
 
 # Revenir à l'utilisateur Jenkins
 USER jenkins
