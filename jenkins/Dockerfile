@@ -30,4 +30,4 @@ RUN chmod 666 /var/run/docker.sock || true
 
 # Revenir à l'utilisateur Jenkins
 # USER jenkins
-USER root
+# USER root
