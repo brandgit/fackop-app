@@ -6,12 +6,6 @@ pipeline {
     }
     
     stages {
-        stage('List env vars'){
-            steps{
-                sh "printenv | sort"
-            }
-
-        }
         stage('using env vars'){
             steps{
                 echo "DEPLOY_PORT = ${env.DEPLOY_PORT}"
