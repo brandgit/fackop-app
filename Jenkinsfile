@@ -20,12 +20,15 @@ pipeline {
                 script {
                     // Vérifier si le fichier .env existe
                     if (fileExists(env.ENV_FILE)) {
+                            // Extraire et charger une seule variable d'environnement
+                        def dockerImageName = sh(script: "grep ^DOCKER_IMAGE_NAME= ${env.ENV_FILE} | cut -d '=' -f2", returnStdout: true).trim()
+                        echo "DOCKER_IMAGE_NAME = ${dockerImageName}"
+                        env.DOCKER_IMAGE_NAME = dockerImageName // Charger la variable dans l'environnement Jenkins
                         sh '''
-                            // echo "Fichier .env trouvé. Chargement des variables..."
+                            #echo "Fichier .env trouvé. Chargement des variables..."
         
                             export $(cat ${ENV_FILE} | xargs)
-                            // export $(cat ${ENV_FILE.DOCKER_IMAGE_NAME} | xargs)
-                            // export $(cat ${ENV_FILE.DEPLOY_HOST} | xargs)
+                            export $(cat ${ENV_FILE.DOCKER_IMAGE_NAME} | xargs)
                         '''
                     } else {
                         error("Le fichier .env est introuvable à l'emplacement : ${ENV_FILE}")
