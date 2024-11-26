@@ -21,10 +21,10 @@ pipeline {
                     // Vérifier si le fichier .env existe
                     if (fileExists(env.ENV_FILE)) {
                         sh '''
-                            echo "Fichier .env trouvé. Chargement des variables..."
+                            // echo "Fichier .env trouvé. Chargement des variables..."
         
-                            export $(cat ${ENV_FILE} | xargs)
-                            export $(cat ${ENV_FILE.DOCKER_IMAGE_NAME} | xargs)
+                            // export $(cat ${ENV_FILE} | xargs)
+                            // export $(cat ${ENV_FILE.DOCKER_IMAGE_NAME} | xargs)
                             export $(cat ${ENV_FILE.DEPLOY_HOST} | xargs)
                         '''
                     } else {
@@ -49,7 +49,7 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE_NAME --build-arg GITHUB_REPO=$GITHUB_REPO .'
+                sh 'docker build -t ${ENV_FILE.DOCKER_IMAGE_NAME} --build-arg GITHUB_REPO=${ENV_FILE.GITHUB_REPO} .'
             }
         }
         stage('Run Tests') {
