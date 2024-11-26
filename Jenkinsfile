@@ -23,9 +23,9 @@ pipeline {
                         sh '''
                             // echo "Fichier .env trouvé. Chargement des variables..."
         
-                            // export $(cat ${ENV_FILE} | xargs)
+                            export $(cat ${ENV_FILE} | xargs)
                             // export $(cat ${ENV_FILE.DOCKER_IMAGE_NAME} | xargs)
-                            export $(cat ${ENV_FILE.DEPLOY_HOST} | xargs)
+                            // export $(cat ${ENV_FILE.DEPLOY_HOST} | xargs)
                         '''
                     } else {
                         error("Le fichier .env est introuvable à l'emplacement : ${ENV_FILE}")
