@@ -20,11 +20,9 @@ RUN curl -L "https://github.com/docker/compose/releases/download/2.5.1/docker-co
     -o /usr/local/bin/docker-compose && \
     chmod +x /usr/local/bin/docker-compose
 
-# Ajouter l'utilisateur Jenkins au groupe Docker et appliquer les permissions
-RUN groupadd -g 998 docker || true && \
-    usermod -aG docker jenkins && \
-    chown root:docker /var/run/docker.sock || true && \
-    chmod 666 /var/run/docker.sock
+# Ajouter l'utilisateur Jenkins au groupe Docker
+RUN groupadd -f docker && usermod -aG docker jenkins
 
 # Revenir à l'utilisateur Jenkins
-USER jenkins
+# USER jenkins
+USER BrandDev
