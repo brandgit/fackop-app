@@ -29,5 +29,5 @@ RUN groupadd -f docker && usermod -aG docker jenkins
 RUN chmod 666 /var/run/docker.sock || true
 
 # Revenir à l'utilisateur Jenkins
-# USER jenkins
+USER jenkins
 # USER root
