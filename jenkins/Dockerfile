@@ -22,6 +22,7 @@ RUN curl -L "https://github.com/docker/compose/releases/download/2.5.1/docker-co
 
 # Créer le groupe docker s'il n'existe pas déjà et ajouter Jenkins au groupe
 RUN groupadd -f docker && usermod -aG docker jenkins
+RUN groupadd -g 998 docker || true && usermod -aG docker jenkins
 
 # Modifier les permissions du socket Docker
 RUN chmod 666 /var/run/docker.sock || true

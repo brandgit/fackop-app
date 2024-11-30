@@ -39,8 +39,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock   # Monter uniquement le socket Docker si nécessaire
       - .env:/var/jenkins_home/.env  # Monter le fichier .env pour Jenkins
       - .env:/var/jenkins_home/workspace/.env  # Monter le fichier .env pour Jenkins
-    # command: >
-    #   sh -c "chmod 666 /var/run/docker.sock && /usr/local/bin/jenkins.sh"
+    command: >
+      sh -c "chown root:docker /var/run/docker.sock && chmod 660 /var/run/docker.sock && /usr/local/bin/jenkins.sh"
     networks:
       - ci_network
 
