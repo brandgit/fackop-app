@@ -25,5 +25,11 @@ RUN groupadd -f docker && usermod -aG docker jenkins
 # Modifier les permissions pour le fichier Docker socket
 RUN chmod 777 /var/run/docker.sock || true
 
+# Installer sudo
+RUN apt-get update && apt-get install -y sudo
+
+# Donner à Jenkins l'accès sudo sans mot de passe
+RUN echo "jenkins ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
 # Revenir à l'utilisateur Jenkins
 USER jenkins
