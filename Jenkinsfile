@@ -57,7 +57,7 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${env.DOCKER_IMAGE_NAME} --build-arg GITHUB_REPO=${env.GITHUB_REPO} ."
+                sh "docker build -t ${env.DOCKER_IMAGE_NAME} -f jenkins/Dockerfile --build-arg GITHUB_REPO=${env.GITHUB_REPO} ."
             }
         }
         stage('Run Tests') {
