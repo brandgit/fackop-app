@@ -1,10 +1,9 @@
-# Utiliser l'image officielle Jenkins LTS
 FROM jenkins/jenkins:lts
 
-# Passer en mode root pour installer des outils
+# Passer à root pour installer les outils nécessaires
 USER root
 
-# Installer Docker et les outils nécessaires
+# Installer Docker et ses dépendances
 RUN apt-get update && apt-get install -y \
     apt-transport-https \
     ca-certificates \
@@ -17,15 +16,10 @@ RUN apt-get update && apt-get install -y \
 
 # Ajouter Docker Compose
 RUN curl -L "https://github.com/docker/compose/releases/download/2.5.1/docker-compose-$(uname -s)-$(uname -m)" \
-    -o /usr/local/bin/docker-compose && \
-    chmod +x /usr/local/bin/docker-compose
+    -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose
 
-# Créer le groupe docker s'il n'existe pas déjà et ajouter Jenkins au groupe
-RUN groupadd -f docker && usermod -aG docker jenkins
-RUN groupadd -g 998 docker || true && usermod -aG docker jenkins
-
-# Modifier les permissions du socket Docker
+# Changer les permissions du socket Docker
 RUN chmod 666 /var/run/docker.sock || true
 
-# Rester en tant qu'utilisateur root (commenter la ligne suivante si vous voulez revenir à l'utilisateur jenkins)
+# Revenir à l'utilisateur Jenkins
 USER jenkins
