@@ -27,4 +27,4 @@ RUN groupadd -f docker && usermod -aG docker jenkins
 RUN chmod 666 /var/run/docker.sock || true
 
 # Rester en tant qu'utilisateur root (commenter la ligne suivante si vous voulez revenir à l'utilisateur jenkins)
-USER root
+USER jenkins
