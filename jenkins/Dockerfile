@@ -31,5 +31,12 @@ RUN apt-get update && apt-get install -y sudo
 # Donner à Jenkins l'accès sudo sans mot de passe
 RUN echo "jenkins ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
+# Installer Node.js v18.20.5
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
+
+# Vérifier la version de Node.js et npm
+RUN node -v && npm -v
+
 # Revenir à l'utilisateur Jenkins
 USER jenkins

@@ -64,8 +64,11 @@ pipeline {
             steps {
                 sh '''
                     docker run --rm \
+                    -v $PWD:/app \
+                    -w /app \
                     -e NODE_ENV=${NODE_ENV} \
-                    ${DOCKER_IMAGE_NAME} npm run test
+                    node:16-alpine \
+                    sh -c "npm install && npm run test"
                 '''
                 sh '''
                     docker cp $(docker create ${DOCKER_IMAGE_NAME}):/app/coverage ./coverage
