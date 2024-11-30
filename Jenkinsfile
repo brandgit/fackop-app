@@ -67,7 +67,7 @@ pipeline {
                     -v $PWD:/app \
                     -w /app \
                     -e NODE_ENV=${NODE_ENV} \
-                    node:16-alpine \
+                    node:18.20.5-alpine \
                     sh -c "npm install && npm run test"
                 '''
                 sh '''
