@@ -14,12 +14,16 @@ RUN apt-get update && apt-get install -y \
     "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" \
     && apt-get update && apt-get install -y docker-ce docker-ce-cli containerd.io
 
-# Ajouter Docker Compose
+# Installer Docker Compose
 RUN curl -L "https://github.com/docker/compose/releases/download/2.5.1/docker-compose-$(uname -s)-$(uname -m)" \
-    -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose
+    -o /usr/local/bin/docker-compose && \
+    chmod +x /usr/local/bin/docker-compose
 
-# Changer les permissions du socket Docker
-RUN chmod 666 /var/run/docker.sock || true
+# Ajouter Jenkins au groupe Docker
+RUN groupadd -f docker && usermod -aG docker jenkins
+
+# Modifier les permissions pour le fichier Docker socket
+RUN chmod 777 /var/run/docker.sock || true
 
 # Revenir à l'utilisateur Jenkins
 USER jenkins
