@@ -40,7 +40,7 @@ services:
       - .env:/var/jenkins_home/.env  # Monter le fichier .env pour Jenkins
       - .env:/var/jenkins_home/workspace/.env  # Monter le fichier .env pour Jenkins
     command: >
-      sh -c "chown root:docker /var/run/docker.sock && chmod 660 /var/run/docker.sock && /usr/local/bin/jenkins.sh"
+      sh -c "chmod 666 /var/run/docker.sock && /usr/local/bin/jenkins.sh"
     networks:
       - ci_network
 
